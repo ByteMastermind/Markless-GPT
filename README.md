@@ -1,3 +1,11 @@
+# Markless-GPT
+
+A Chromium extension and online tool that filters out hidden watermark markers from ChatGPT (and other LLM) outputs, ensuring you copy clean, human-readable text.
+
+**Try the online tool:** [https://bytemastermind.github.io/Markless-GPT/](https://bytemastermind.github.io/Markless-GPT/)
+
+---
+
 ## 🚀 Features
 
 - **Automatic Filtering**  
@@ -7,7 +15,7 @@
   Detect and remove special characters or invisible markers that some models inject to tag AI‑generated text—leaving you with clean, human‑readable content.
 
 - **Zero Permissions Overhead**  
-  No extra “clipboardWrite” permission required—PurePaste hooks into the page’s native copy/cut events and the modern `navigator.clipboard.writeText` API.
+  No extra `clipboardWrite` permission required—Markless‑GPT hooks into the page’s native copy/cut events and the modern `navigator.clipboard.writeText` API.
 
 - **Domain‑Aware Toggle**  
   Easily enable or disable filtering on a per‑site basis via the extension’s popup UI.
@@ -27,7 +35,7 @@
 2. Load into your Chromium‑based browser  
    - Go to `chrome://extensions/` (or `edge://extensions/`, etc.)  
    - Enable “Developer mode”  
-   - Click **Load unpacked** and select this repo’s root folder  
+   - Click **Load unpacked** and select this repo’s root folder
 
 3. Enjoy watermark‑free copying!
 
@@ -35,7 +43,7 @@
 
 ## ⚙️ Usage
 
-1. Click the Markless-GPT toolbar icon to toggle filtering on or off for the current domain.  
+1. Click the **Markless-GPT** toolbar icon to toggle filtering on or off for the current domain.  
 2. Copy text as you normally would—either by selecting and hitting Ctrl+C (⌘+C) or by clicking any “Copy” buttons on the page.  
 3. Paste: you’ll get the same text, minus any hidden watermark markers.
 
@@ -54,12 +62,13 @@ You can swap in your own regex, call out to a background script for heavy proces
 
 ---
 
-## 💡 Why PurePaste?
+## 💡 Why Markless-GPT?
 
-LLMs sometimes embed invisible tokens or special characters to “mark” AI‑generated text. PurePaste ensures that anything you copy and paste is free of these behind‑the‑scenes markers, making your workflows cleaner and more reliable.
+LLMs sometimes embed invisible tokens or special characters to “mark” AI‑generated text. Markless‑GPT ensures that anything you copy and paste is free of these behind‑the‑scenes markers, making your workflows cleaner and more reliable.
 
 ---
 
 ## 📄 License
 
-MIT © 
+MIT © [bytemastermind](https://github.com/ByteMastermind)
+
