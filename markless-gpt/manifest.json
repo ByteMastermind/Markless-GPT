@@ -1,9 +1,11 @@
 {
+  "name": "Markless‑GPT – Clipboard Filter",
+  "description": "Filters copied text (removes non‑breaking / zero‑width spaces) before it reaches your clipboard.",
+  "version": "1.0.0",
   "manifest_version": 3,
-  "name": "Markless‑GPT",
-  "version": "1.1",
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "clipboardWrite"
   ],
   "content_scripts": [
     {
