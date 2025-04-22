@@ -1,17 +1,17 @@
 {
   "manifest_version": 3,
-  "name": "MarklessGPT",
-  "version": "1.0",
+  "name": "Markless‑GPT",
+  "version": "1.1",
   "permissions": [
-    "activeTab",              // to let your content script run
-    "clipboardWrite"        // not needed for handling copy/cut events
+    "activeTab"
   ],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
       "js": ["content-script.js"],
-      "run_at": "document_start"
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true
     }
   ]
 }
-
