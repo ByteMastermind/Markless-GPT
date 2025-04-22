@@ -35,7 +35,7 @@ A Chromium extension and online tool that filters out hidden watermark markers f
 2. Load into your Chromium‑based browser  
    - Go to `chrome://extensions/` (or `edge://extensions/`, etc.)  
    - Enable “Developer mode”  
-   - Click **Load unpacked** and select this repo’s root folder
+   - Click **Load unpacked** and select `markless-gpt` directory
 
 3. Enjoy watermark‑free copying!
 
