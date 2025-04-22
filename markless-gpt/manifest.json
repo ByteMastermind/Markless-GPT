@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Clipboard Filter",
+  "version": "1.0",
+  "permissions": [
+    "activeTab"              // to let your content script run
+    // "clipboardWrite"      // not needed for handling copy/cut events
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-script.js"],
+      "run_at": "document_start"
+    }
+  ]
+}
+
