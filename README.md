@@ -45,7 +45,7 @@ A Chromium extension and online tool that filters out hidden watermark markers f
 
 1. Click the **Markless-GPT** toolbar icon to toggle filtering on or off for the current domain.  
 2. Copy text as you normally would—either by selecting and hitting Ctrl+C (⌘+C) or by clicking any “Copy” buttons on the page.  
-3. Paste: you’ll get the same text, minus any hidden watermark markers.
+3. Paste: you’ll get the same text, minus any hidden watermark markers. (Verify [here](https://bytemastermind.github.io/Markless-GPT/))
 
 ---
 
