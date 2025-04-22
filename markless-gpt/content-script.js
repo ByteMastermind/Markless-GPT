@@ -1,7 +1,12 @@
 // 1) A simple text‐processing function
-function filterText(str) {
-  // e.g. remove all digits, or run a profanity filter, etc.
-  return str.replace(/\d+/g, '');
+function filterText(input) {
+  // 1) Normalize NBSP → normal space
+  let text = input.replace(/\u00A0/g, ' ');
+  // 2) (Optional) strip zero‑width chars
+  text = text.replace(/[\u200B-\u200D\uFEFF]/g, '');
+  // 3) (Any additional filters you need)
+  // e.g. remove digits: text = text.replace(/\d+/g, '');
+  return text;
 }
 
 // 2) Handler for both copy and cut

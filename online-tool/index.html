@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Markless-GPT</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --fg: #e0e0e0;
+      --accent: #1e88e5;
+      --input-bg: #1e1e1e;
+      --border: #333;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; background: var(--bg); color: var(--fg); }
+    header { padding: 1rem; text-align: center; border-bottom: 1px solid var(--border); }
+    header h1 { margin: 0; font-size: 1.5rem; }
+    nav { display: flex; justify-content: center; margin-top: 1rem; }
+    nav button {
+      background: none;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      margin: 0 0.5rem;
+      font-size: 1rem;
+      color: var(--fg);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    nav button.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .tab-content { display: none; padding: 1rem; }
+    .tab-content.active { display: block; }
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.5rem;
+      resize: vertical;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    button.action {
+      margin-top: 0.75rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+    button.action:hover {
+      background: #1565c0;
+    }
+    .output {
+      margin-top: 1rem;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      background: var(--input-bg);
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    #copy-convert { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Markless-GPT</h1>
+  </header>
+
+  <nav>
+    <button data-tab="check" class="active">Check Marks</button>
+    <button data-tab="convert">Convert Text</button>
+  </nav>
+
+  <main>
+    <section id="check" class="tab-content active">
+      <h2>Check for Watermark Markers</h2>
+      <textarea id="check-input" placeholder="Paste your text here..."></textarea>
+      <button id="check-btn" class="action">Check</button>
+      <div id="check-result" class="output"></div>
+    </section>
+
+    <section id="convert" class="tab-content">
+      <h2>Convert to Markless Text</h2>
+      <textarea id="convert-input" placeholder="Paste your text here..."></textarea>
+      <button id="convert-btn" class="action">Convert</button>
+      <div id="convert-result" class="output"></div>
+      <button id="copy-convert" class="action">Copy Output</button>
+    </section>
+  </main>
+
+  <script>
+    // Normalize and strip watermark markers
+    function filterText(str) {
+      // 1) Replace non-breaking spaces with normal spaces
+      let text = str.replace(/\u00A0/g, ' ');
+      // 2) Remove zero-width characters
+      text = text.replace(/[\u200B-\u200D\uFEFF]/g, '');
+      return text;
+    }
+
+    // Check for presence of watermark markers
+    function checkMarks() {
+      const input = document.getElementById('check-input').value;
+      const matches = input.match(/[\u00A0\u200B-\u200D\uFEFF]/g);
+      const count = matches ? matches.length : 0;
+      const resultDiv = document.getElementById('check-result');
+      if (count === 0) {
+        resultDiv.textContent = '✔ No watermark markers found.';
+      } else {
+        resultDiv.textContent = `⚠ Found ${count} watermark marker${count > 1 ? 's' : ''}.`;
+      }
+    }
+
+    // Convert input to markless text
+    function convertText() {
+      const input = document.getElementById('convert-input').value;
+      const out = filterText(input);
+      const resultDiv = document.getElementById('convert-result');
+      resultDiv.textContent = out;
+      document.getElementById('copy-convert').style.display = out ? 'inline-block' : 'none';
+    }
+
+    // Copy converted output to clipboard
+    function copyOutput() {
+      const out = document.getElementById('convert-result').textContent;
+      navigator.clipboard.writeText(out);
+    }
+
+    // Event listeners
+    document.getElementById('check-btn').addEventListener('click', checkMarks);
+    document.getElementById('convert-btn').addEventListener('click', convertText);
+    document.getElementById('copy-convert').addEventListener('click', copyOutput);
+
+    // Tab switching logic
+    document.querySelectorAll('nav button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('nav button').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach((sec) => sec.classList.remove('active'));
+        document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
