@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Clipboard Filter",
+  "name": "MarklessGPT",
   "version": "1.0",
   "permissions": [
-    "activeTab"              // to let your content script run
-    // "clipboardWrite"      // not needed for handling copy/cut events
+    "activeTab",              // to let your content script run
+    "clipboardWrite"        // not needed for handling copy/cut events
   ],
   "content_scripts": [
     {
