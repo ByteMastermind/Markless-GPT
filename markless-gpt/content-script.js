@@ -85,6 +85,31 @@
     },
     true /* capture – so we’re guaranteed to see the click */
   );
+
+  document.addEventListener(
+    'click',
+    e => {
+      // look for any button with aria-label="Copy"
+      const btn = e.target.closest('button[aria-label="Copy"],' + 'button[data-testid="copy-turn-action-button"]');
+      if (!btn) return;
+  
+      // let the site copy its raw text first
+      setTimeout(async () => {
+        try {
+          const raw = await navigator.clipboard.readText();  // needs clipboard-read permission
+          const clean = filterText(raw);                    // your cleaning function
+  
+          // overwrite clipboard with cleaned text
+          await navigator.clipboard.writeText(clean);
+          logCopy(raw, clean, 'button‑fallback');
+          showToast();
+        } catch (err) {
+          console.warn('[Markless‑GPT] button‑fallback failed:', err);
+        }
+      }, 500);  // wait half a second
+    },
+    true  // capture phase, to catch the click before anything else
+  );
   
   const onCopyCut = e => {
     const cd = e.clipboardData;
@@ -118,89 +143,4 @@
 
   document.addEventListener('copy', onCopyCut, true);
   document.addEventListener('cut',  onCopyCut, true);
-
-  /* ========================================================= *
-   *  2)  PAGE‑WORLD PATCH – covers ChatGPT copy button, etc.   *
-   * ========================================================= */
-  const patchCode = `
-    (() => {
-      const filterText = ${filterText.toString()};
-      const log = ${logCopy.toString()}.bind(null);   // re‑use the logger
-
-      const fireToast = () => window.dispatchEvent(new CustomEvent('markless-copy'));
-
-      /* helper: replace plain/html blobs in a ClipboardItem */
-      async function filtItem(item) {
-        const pairs = await Promise.all(item.types.map(async type => {
-          let blob = await item.getType(type);
-          if (type === 'text/plain' || type === 'text/html') {
-            const txt = await blob.text();
-            const clean = filterText(txt);
-            log(txt, clean, 'ClipboardItem');
-            blob = new Blob([clean], { type });
-          }
-          return [type, blob];
-        }));
-        return new ClipboardItem(Object.fromEntries(pairs));
-      }
-
-      /* ───────────────── navigator.clipboard.writeText ───────────── */
-      if (navigator.clipboard?.writeText) {
-        const orig = navigator.clipboard.writeText.bind(navigator.clipboard);
-        Object.defineProperty(navigator.clipboard, 'writeText', {
-          value: (txt, ...rest) => {
-            const clean = filterText(txt);
-            log(txt, clean, 'writeText');
-            fireToast();
-            return orig(clean, ...rest);
-          },
-          writable: false, configurable: false
-        });
-      }
-
-      /* ───────────────── navigator.clipboard.write ───────────────── */
-      if (navigator.clipboard?.write) {
-        const orig = navigator.clipboard.write.bind(navigator.clipboard);
-        Object.defineProperty(navigator.clipboard, 'write', {
-          value: async items => {
-            const newItems = await Promise.all(items.map(filtItem));
-            fireToast();
-            return orig(newItems);
-          },
-          writable: false, configurable: false
-        });
-      }
-
-      /* ───────────────── DataTransfer.setData (execCommand) ──────── */
-      if (window.DataTransfer) {
-        const origSet = DataTransfer.prototype.setData;
-        DataTransfer.prototype.setData = function(type, data) {
-          if (type === 'text/plain' || type === 'text/html') {
-            const clean = filterText(data);
-            log(data, clean, 'DataTransfer.setData');
-            fireToast();
-            return origSet.call(this, type, clean);
-          }
-          return origSet.call(this, type, data);
-        };
-      }
-
-      /* ───────────────── document.execCommand('copy', … val) ─────── */
-      const execOrig = Document.prototype.execCommand;
-      Document.prototype.execCommand = function(cmd, showUI, val) {
-        if (cmd === 'copy' && typeof val === 'string') {
-          const clean = filterText(val);
-          log(val, clean, 'execCommand');
-          fireToast();
-          return execOrig.call(this, cmd, showUI, clean);
-        }
-        return execOrig.call(this, cmd, showUI, val);
-      };
-    })();
-  `;
-
-  const s = document.createElement('script');
-  s.textContent = patchCode;
-  (document.documentElement || document.head).appendChild(s);
-  s.remove();
 })();
