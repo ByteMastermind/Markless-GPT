@@ -85,6 +85,30 @@
       font-size: 1rem;
       box-shadow: 0 2px 4px var(--shadow);
     }
+    .output-wrapper {
+      max-height: 60vh; /* scroll height  */
+      overflow-y: auto;
+      position: relative;
+      margin-top: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--input-bg);
+      box-shadow: 0 2px 4px var(--shadow);
+    }
+    .output-wrapper .actions {
+      position: sticky;
+      top: 0;
+      background: var(--input-bg);
+      padding: 0.75rem;
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      z-index: 1;
+    }
+    .output-wrapper .output {
+      margin-top: 0; 
+      padding: 0.75rem;
+    }
     #copy-convert { display: none; }
   </style>
 </head>
@@ -110,9 +134,14 @@
       <section id="convert" class="tab-content">
         <h2>Convert to Markless Text</h2>
         <textarea id="convert-input" placeholder="Paste your text here..."></textarea>
-        <button id="convert-btn" class="action">Convert</button>
-        <div id="convert-result" class="output"></div>
-        <button id="copy-convert" class="action">Copy Output</button>
+
+        <div class="output-wrapper">
+          <div class="actions">
+            <button id="convert-btn" class="action">Convert</button>
+            <button id="copy-convert" class="action">Copy Output</button>
+          </div>
+          <div id="convert-result" class="output"></div>
+        </div>
       </section>
     </main>
   </div>
