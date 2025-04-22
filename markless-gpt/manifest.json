@@ -5,7 +5,8 @@
   "manifest_version": 3,
   "permissions": [
     "activeTab",
-    "clipboardWrite"
+    "clipboardWrite",
+    "clipboardRead" 
   ],
   "content_scripts": [
     {
