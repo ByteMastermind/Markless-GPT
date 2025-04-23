@@ -65,30 +65,6 @@
   document.addEventListener(
     'click',
     e => {
-      const btn = e.target.closest('button[data-testid="copy-turn-action-button"]');
-      if (!btn) return;
-  
-      /* let the site perform its copy first */
-      setTimeout(async () => {
-        try {
-          const raw = await navigator.clipboard.readText();  // needs clipboardRead
-          const clean = filterText(raw);
-  
-          // always overwrite clipboard with clean text
-          await navigator.clipboard.writeText(clean);
-          logCopy(raw, clean, 'button‑fallback');
-          showToast();
-        } catch (err) {
-          console.warn('[Markless‑GPT] button‑fallback failed:', err);
-        }
-      }, 500); // 0.5 seconds
-    },
-    true /* capture – so we’re guaranteed to see the click */
-  );
-
-  document.addEventListener(
-    'click',
-    e => {
       // look for any button with aria-label="Copy"
       const btn = e.target.closest('button[aria-label="Copy"],' + 'button[data-testid="copy-turn-action-button"]');
       if (!btn) return;
@@ -106,7 +82,7 @@
         } catch (err) {
           console.warn('[Markless‑GPT] button‑fallback failed:', err);
         }
-      }, 500);  // wait half a second
+      }, 100);
     },
     true  // capture phase, to catch the click before anything else
   );
