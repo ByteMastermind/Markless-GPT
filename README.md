@@ -1,6 +1,3 @@
-Here’s an updated README reflecting the slimmed-down extension (the online tool is still live, even though it doesn’t surface in the extension UI):
-
-```markdown
 # Markless-GPT
 
 A lightweight Chromium extension that cleans out hidden watermark markers (zero-width and similar) from any text you copy—whether via Ctrl +C/⌘ +C, programmatic “Copy” buttons, or cut events—so you always get plain, human-readable content.
