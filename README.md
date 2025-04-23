@@ -1,74 +1,77 @@
+Here’s an updated README reflecting the slimmed-down extension (the online tool is still live, even though it doesn’t surface in the extension UI):
+
+```markdown
 # Markless-GPT
 
-A Chromium extension and online tool that filters out hidden watermark markers from ChatGPT (and other LLM) outputs, ensuring you copy clean, human-readable text.
+A lightweight Chromium extension that cleans out hidden watermark markers (zero-width and similar) from any text you copy—whether via Ctrl +C/⌘ +C, programmatic “Copy” buttons, or cut events—so you always get plain, human-readable content.
 
-**Try the online tool:** [https://bytemastermind.github.io/Markless-GPT/](https://bytemastermind.github.io/Markless-GPT/)
+> **Online tool available:**  
+> https://bytemastermind.github.io/Markless-GPT/
 
 ---
 
 ## 🚀 Features
 
 - **Automatic Filtering**  
-  Intercepts both manual copy (Ctrl+C/⌘+C) and programmatic clipboard writes (e.g. “Copy” buttons), funneling every snippet through a customizable text‑processing pipeline.
-
+  Intercepts every copy- or cut-event on the page and runs it through a simple `filterText()` pipeline.
 - **Watermark Removal**  
-  Detect and remove special characters or invisible markers that some models inject to tag AI‑generated text—leaving you with clean, human‑readable content.
-
-- **Zero Permissions Overhead**  
-  No extra `clipboardWrite` permission required—Markless‑GPT hooks into the page’s native copy/cut events and the modern `navigator.clipboard.writeText` API.
-
-- **Domain‑Aware Toggle**  
-  Easily enable or disable filtering on a per‑site basis via the extension’s popup UI.
-
-- **Extensible Filter Function**  
-  Replace the built‑in `filterText()` routine with your own logic (regex, profanity filters, token redaction, etc.).
+  Strips zero-width spaces, non-breaking spaces, and other invisible markers often injected by AI models.
+- **Button-Click Fallback**  
+  Detects “Copy” buttons, lets the page write first, then cleans up what lands on the clipboard.
+- **Inline Toast & Logging**  
+  Brief “Text safely copied!” toast for feedback plus console logs of raw vs. cleaned text.
+- **No Extra Permissions**  
+  Works without requesting any special `"clipboardWrite"` or host permissions—hooks into existing copy/cut handlers and the standard Clipboard API.
 
 ---
 
 ## 📦 Installation
 
-1. Clone this repository  
+1. **Clone** the repo  
    ```bash
    git clone https://github.com/ByteMastermind/Markless-GPT.git
    ```
+2. **Load** into your browser  
+   - Navigate to `chrome://extensions/` (or `edge://extensions/`, etc.)  
+   - Enable **Developer mode**  
+   - Click **Load unpacked** and select the `markless-gpt/` folder  
 
-2. Load into your Chromium‑based browser  
-   - Go to `chrome://extensions/` (or `edge://extensions/`, etc.)  
-   - Enable “Developer mode”  
-   - Click **Load unpacked** and select `markless-gpt` directory
-
-3. Enjoy watermark‑free copying!
+That’s it - no restart needed.
 
 ---
 
 ## ⚙️ Usage
 
-1. Click the **Markless-GPT** toolbar icon to toggle filtering on or off for the current domain.  
-2. Copy text as you normally would—either by selecting and hitting Ctrl+C (⌘+C) or by clicking any “Copy” buttons on the page.  
-3. Paste: you’ll get the same text, minus any hidden watermark markers. (Verify [here](https://bytemastermind.github.io/Markless-GPT/))
+1. Copy or cut anything on any page in your Chromium-based browser:  
+   - **Keyboard** → Ctrl +C / Ctrl + X (⌘ +C / ⌘ + X on macOS)  
+   - **Buttons** → a traditional copy buttons on the page
+2. Paste anywhere - you’ll get the exact same text minus hidden watermark characters.  
 
 ---
 
 ## 🛠️ Customizing the Filter
 
-Open `content-script.js` and edit:
+Open `content-script.js` and tweak the `filterText` function:
+
 ```js
-function filterText(input) {
-  // Default: strip out all non‑printable (zero‑width) characters
-  return input.replace(/[\u200B-\u200D\uFEFF]/g, '');
-}
+// Default removes common zero-width / invisible chars:
+const filterText = input =>
+  input
+    .replace(/\u00A0/g, ' ')
+    .replace(/\u202F/g, ' ')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '');
 ```
-You can swap in your own regex, call out to a background script for heavy processing, or integrate third‑party libraries.
+
+Feel free to extend it with your own regex rules, profanity filters, token redaction, or remote processing via a background script.
 
 ---
 
 ## 💡 Why Markless-GPT?
 
-LLMs sometimes embed invisible tokens or special characters to “mark” AI‑generated text. Markless‑GPT ensures that anything you copy and paste is free of these behind‑the‑scenes markers, making your workflows cleaner and more reliable.
+LLMs and other pipelines sometimes slip in invisible markers to tag AI-generated text. Markless-GPT makes sure anything you copy is free of these hidden artifacts—no permissions, no popups, just clean text.
 
 ---
 
 ## 📄 License
 
-MIT © [bytemastermind](https://github.com/ByteMastermind)
-
+MIT © [ByteMastermind](https://github.com/ByteMastermind)
