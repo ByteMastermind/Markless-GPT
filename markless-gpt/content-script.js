@@ -8,7 +8,8 @@
    * ========================================================= */
   const filterText = txt =>
     txt
-      .replace(/\u00A0/g, ' ')          // NB‑spaces → normal spaces
+      .replace(/\u00A0/g, ' ')     
+      .replace(/\u202F/g, ' ')      
       .replace(/[\u200B-\u200D\uFEFF]/g, '');
 
   function logCopy(raw, clean, origin) {
