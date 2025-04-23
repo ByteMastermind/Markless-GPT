@@ -1,30 +1,21 @@
-// content‑script.js  — runs at document_start
 (() => {
   'use strict';
-  console.log('[Markless‑GPT] content script loaded');
 
-  /* ========================================================= *
-   *  0)  UTIL:  filtering + toast + logger                     *
-   * ========================================================= */
-  const filterText = txt =>
-    txt
-      .replace(/\u00A0/g, ' ')     
-      .replace(/\u202F/g, ' ')      
-      .replace(/[\u200B-\u200D\uFEFF]/g, '');
+  /* utils */
+  const filterText = t => t
+    .replace(/\u00A0/g, ' ')
+    .replace(/\u202F/g, ' ')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '');
 
-  function logCopy(raw, clean, origin) {
-    console.log(
-      `[Markless‑GPT] COPY (${origin})\n` +
-      `  raw   : ${JSON.stringify(raw)}\n` +
-      `  clean : ${JSON.stringify(clean)}`
-    );
-  }
+  /* logging */
+  const logCopy = (raw, clean, origin) =>
+    console.log(`[Markless-GPT] COPY (${origin})\n  raw   : ${JSON.stringify(raw)}\n  clean : ${JSON.stringify(clean)}`);
 
-  /* quick inline toast – auto‑remove after 2 s */
-  function showToast () {
-    const toast = document.createElement('div');
-    toast.textContent = 'Text safely copied !';
-    Object.assign(toast.style, {
+  /* toast */
+  const showToast = () => {
+    const el = document.createElement('div');
+    el.textContent = 'Text safely copied!';
+    Object.assign(el.style, {
       position: 'fixed',
       top: '12px',
       left: '50%',
@@ -40,64 +31,63 @@
       opacity: '1',
       transition: 'opacity .4s ease'
     });
-    document.body.appendChild(toast);
-    setTimeout(() => (toast.style.opacity = '0'), 1600);
-    setTimeout(() => toast.remove(), 2000);
-  }
+    document.body.appendChild(el);
+    setTimeout(() => (el.style.opacity = '0'), 1600);
+    setTimeout(() => el.remove(), 2000);
+  };
 
-  /* listen for CustomEvent fired by page‑world patch */
   window.addEventListener('markless-copy', showToast);
 
-  /* ========================================================= *
-   *  1)  USER‑INITIATED copy / cut events                      *
-   * ========================================================= */
+  /* “Copy”-button fallback */
+  document.addEventListener(
+    'click',
+    e => {
+      const btn = e.target.closest(
+        'button[aria-label="Copy"],button[data-testid="copy-turn-action-button"]'
+      );
+      if (!btn) return;
+
+      setTimeout(async () => {
+        try {
+          const raw   = await navigator.clipboard.readText();
+          const clean = filterText(raw);
+          await navigator.clipboard.writeText(clean);
+          logCopy(raw, clean, 'button');
+          showToast();
+        } catch (err) {
+          console.warn('[Markless-GPT] button copy failed:', err);
+        }
+      }, 100);
+    },
+    true
+  );
+
+  /* Ctrl-C / Ctrl-X */
   const getSelectedText = () => {
     const sel = window.getSelection();
     if (sel && sel.toString()) return sel.toString();
 
     const el = document.activeElement;
-    if (el && (el.tagName === 'TEXTAREA' ||
-               (el.tagName === 'INPUT' && el.type === 'text')))
+    if (
+      el &&
+      (el.tagName === 'TEXTAREA' ||
+        (el.tagName === 'INPUT' && el.type === 'text'))
+    )
       return el.value.substring(el.selectionStart, el.selectionEnd);
 
     return '';
   };
 
-  document.addEventListener(
-    'click',
-    e => {
-      // look for any button with aria-label="Copy"
-      const btn = e.target.closest('button[aria-label="Copy"],' + 'button[data-testid="copy-turn-action-button"]');
-      if (!btn) return;
-  
-      // let the site copy its raw text first
-      setTimeout(async () => {
-        try {
-          const raw = await navigator.clipboard.readText();  // needs clipboard-read permission
-          const clean = filterText(raw);                    // your cleaning function
-  
-          // overwrite clipboard with cleaned text
-          await navigator.clipboard.writeText(clean);
-          logCopy(raw, clean, 'button‑fallback');
-          showToast();
-        } catch (err) {
-          console.warn('[Markless‑GPT] button‑fallback failed:', err);
-        }
-      }, 100);
-    },
-    true  // capture phase, to catch the click before anything else
-  );
-  
   const onCopyCut = e => {
     const cd = e.clipboardData;
 
-    /* —————————————————— Path 1: site already populated clipboardData */
+    // path 1: site already filled clipboardData
     if (cd.types?.includes('text/plain')) {
       const raw = cd.getData('text/plain');
       const clean = filterText(raw);
       cd.clearData();
       cd.setData('text/plain', clean);
-      cd.setData('text/html',  clean);
+      cd.setData('text/html', clean);
       e.preventDefault();
       e.stopImmediatePropagation();
       logCopy(raw, clean, 'clipboardData');
@@ -105,13 +95,13 @@
       return;
     }
 
-    /* —————————————————— Path 2: normal selection */
+    // path 2: normal selection
     const rawSel = getSelectedText();
     if (!rawSel) return;
 
     const cleanSel = filterText(rawSel);
     cd.setData('text/plain', cleanSel);
-    cd.setData('text/html',  cleanSel);
+    cd.setData('text/html', cleanSel);
     e.preventDefault();
     e.stopImmediatePropagation();
     logCopy(rawSel, cleanSel, 'selection');
